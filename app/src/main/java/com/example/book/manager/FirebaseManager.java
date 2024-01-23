@@ -206,12 +206,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.book.AppController;
-import com.example.book.ChatActivity;
 import com.example.book.MainActivity;
 import com.example.book.ui.Model.Bid;
 import com.example.book.ui.Model.ChatMessage;
 import com.example.book.ui.Model.ChatRoom;
 import com.example.book.ui.Model.User;
+import com.example.book.ui.activity.ChatActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;

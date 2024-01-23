@@ -1,5 +1,9 @@
 package com.example.book.ui.Model;
 
+import static android.content.ContentValues.TAG;
+
+import android.util.Log;
+
 import com.example.book.AppController;
 import com.example.book.manager.UserManager;
 
@@ -18,6 +22,7 @@ public class ChatRoom implements Serializable {
     private String lastMessage;
 
     public ChatRoom() {
+        Log.d(TAG, "ChatRoom: getUser: " + AppController.getInstance().getManager(UserManager.class).getUser());
         this.lastSenderId = AppController.getInstance().getManager(UserManager.class).getUser().getUsername();
         this.lastMessageTimestamp = AppController.getCurrentTimestamp();
         this.messages = new ArrayList<>();

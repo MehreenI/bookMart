@@ -32,24 +32,28 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class BookDetailActivity extends AppCompatActivity {
-
+    
     private ActivityBookDetailBinding binding;
     private Dialog dialogue;
     private FirebaseAuth firebaseAuth;
     String bookPrice;
     String sellerId;
     String bookName;
-
+    String postId;
+    
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityBookDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         firebaseAuth = FirebaseAuth.getInstance();
-
+        
         // Get data from the intent
         Intent intent = getIntent();
-
+        postId = intent.getStringExtra("postId");
+    
+    
         bookName = intent.getStringExtra("bookName");
         bookPrice = intent.getStringExtra("bookPrice");
         String imageUrl = intent.getStringExtra("imageUrl");
@@ -57,12 +61,12 @@ public class BookDetailActivity extends AppCompatActivity {
         ArrayList<String> authorsList = getIntent().getStringArrayListExtra("author");
         String condition = intent.getStringExtra("condition");
         sellerId = intent.getStringExtra("sellerId"); // Assuming you have sellerId in the intent
-
+        
         // Set data to the views
         binding.bookName.setText(bookName);
         binding.bookPrice.setText("Price: " + bookPrice + "/-");
         binding.description.setText(description);
-
+        
         // Check if authorsList is not null before processing
         if (authorsList != null) {
             // displaying Authors separated by comma
@@ -72,20 +76,20 @@ public class BookDetailActivity extends AppCompatActivity {
             }
             // Remove the trailing comma and space
             authorsText = authorsText.replaceAll(", $", "");
-
+            
             binding.author.setText(authorsText);
         } else {
             // Handle the case where authorsList is null or empty
             binding.author.setText("Authors not available");
         }
-
+        
         binding.condition.setText(condition);
-
+        
         // Load image using Picasso
         Picasso.get().load(imageUrl).into(binding.imageView);
-
+        
         dialogue = new Dialog(this);
-
+        
         // click listener on interested button
         binding.interested.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -101,21 +105,21 @@ public class BookDetailActivity extends AppCompatActivity {
             }
         });
     }
-
+    
     private void showOfferedDialogue() {
         dialogue.setContentView(R.layout.activity_dialogue_offer);
-
+        
         Button offerButton = dialogue.findViewById(R.id.bid_offer);
-
+        
         // Move the EditText initialization inside the method
         EditText bidAmountEditText = dialogue.findViewById(R.id.editTextNumber);
-
+        
         offerButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // Get the text when the button is clicked
                 String bidAmount = bidAmountEditText.getText().toString();
-
+                
                 CoinManager coinManager = AppController.getInstance().getManager(CoinManager.class);
                 coinManager.getTotalCoins(new CoinFetchCallback() {
                     @Override
@@ -123,15 +127,15 @@ public class BookDetailActivity extends AppCompatActivity {
                         if (totalCoins >= 5) {
                             // Deduct coins in Firebase
                             deductCoinsFromFirebase(5);
-
+                            
                             // Create and send bid request
                             sendBidRequest(Integer.parseInt(bidAmount), sellerId);
-
+                            
                             Toast.makeText(BookDetailActivity.this, "You are interested! Coins deducted: 5", Toast.LENGTH_SHORT).show();
-
+                            
                             // Close the dialog when the "OK" button is clicked
                             dialogue.dismiss();
-
+                            
                             // Delay starting MainActivity by 1 second so that updated coins are loaded
                             new Handler().postDelayed(new Runnable() {
                                 @Override
@@ -147,17 +151,17 @@ public class BookDetailActivity extends AppCompatActivity {
                 });
             }
         });
-
+        
         dialogue.show();
     }
-
+    
     private void showInterestedDialogueBox() {
         dialogue.setContentView(R.layout.activity_dialogue_bid_offer);
-
+        
         // Find the "OK" button in the dialog layout
         Button okButton = dialogue.findViewById(R.id.ok);
-
-
+        
+        
         // Set click listener on the "OK" button
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -169,15 +173,15 @@ public class BookDetailActivity extends AppCompatActivity {
                         if (totalCoins >= 5) {
                             // Deduct coins in Firebase
                             deductCoinsFromFirebase(5);
-
+                            
                             // Create and send bid request
                             sendBidRequest(Integer.parseInt(bookPrice), sellerId); // Pass sellerId to the method
-
+                            
                             Toast.makeText(BookDetailActivity.this, "You are interested! Coins deducted: 5", Toast.LENGTH_SHORT).show();
-
+                            
                             // Close the dialog when the "OK" button is clicked
                             dialogue.dismiss();
-
+                            
                             // Delay starting MainActivity by 1 second so that updated coins are loaded
                             new Handler().postDelayed(new Runnable() {
                                 @Override
@@ -193,14 +197,14 @@ public class BookDetailActivity extends AppCompatActivity {
                 });
             }
         });
-
+        
         dialogue.show();
     }
-
+    
     private void sendBidRequest(int bidAmount, String sellerId) {
         // Get the user's ID from Firebase Auth
         String bidderId = firebaseAuth.getCurrentUser().getUid();
-
+        
         // Create a new Bid object
         Bid bid = new Bid();
         bid.setBidderId(bidderId);
@@ -208,26 +212,27 @@ public class BookDetailActivity extends AppCompatActivity {
         bid.setTimestamp(System.currentTimeMillis());
         bid.setSellerId(sellerId);
         bid.setbookName(bookName);
-
+        
         bid.setOriginalPrice(Integer.parseInt(bookPrice));
-
+        
         // Reference to the bids node in Firebase
         DatabaseReference bidsRef = FirebaseDatabase.getInstance().getReference("bids");
-
+        
         // Push the bid to Firebase
         String bidId = bidsRef.push().getKey();
         bid.setBidId(bidId);
         bidsRef.child(bidId).setValue(bid);
-
+        
         // Notify the seller about the bid with additional details
         DatabaseReference sellerBidsRef = FirebaseDatabase.getInstance().getReference("users").child(sellerId).child("bids_Notification").child(bidId);
         sellerBidsRef.child("bidderId").setValue(bidderId);
         sellerBidsRef.child("orignalPrice").setValue(bookPrice);
         sellerBidsRef.child("bookName").setValue(bookName);
+        sellerBidsRef.child("postId").setValue(postId);
         sellerBidsRef.child("amount").setValue(bidAmount);
         sellerBidsRef.child("timestamp").setValue(System.currentTimeMillis());
     }
-
+    
     private void userLoginChecked() {
         if (firebaseAuth.getCurrentUser() != null) {
             showInterestedDialogueBox();
@@ -237,25 +242,25 @@ public class BookDetailActivity extends AppCompatActivity {
             Toast.makeText(BookDetailActivity.this, "Kindly Login First", Toast.LENGTH_SHORT).show();
         }
     }
-
+    
     private void deductCoinsFromFirebase(int coinsToDeduct) {
         // Get the user's ID from Firebase Auth
         String userId = firebaseAuth.getCurrentUser().getUid();
-
+        
         // Reference to the user's coin data in Firebase
         DatabaseReference userCoinsRef = FirebaseDatabase.getInstance().getReference("users").child(userId).child("coin");
-
+        
         userCoinsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if (dataSnapshot.exists()) {
                     // Get the current coin balance
                     Integer currentCoins = dataSnapshot.getValue(Integer.class);
-
+                    
                     if (currentCoins != null) {
                         // Deduct the coins
                         int newCoinsBalance = currentCoins - coinsToDeduct;
-
+                        
                         // Update the user's coin balance in Firebase
                         userCoinsRef.setValue(newCoinsBalance);
                     } else {
@@ -265,7 +270,7 @@ public class BookDetailActivity extends AppCompatActivity {
                     Log.e("CoinDeduction", "Data snapshot does not exist");
                 }
             }
-
+            
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
                 // Handle database error if needed

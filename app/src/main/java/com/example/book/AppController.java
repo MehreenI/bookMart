@@ -307,7 +307,7 @@ public class AppController {
                                     user.setUsername(userId);
                                     user.setEmail(email);
                                     user.setCoin(userCoins);
-
+                                    AppController.getInstance().getManager(UserManager.class).setUserLoggedIn(user);
                                     AppController.getInstance().setUser(user);
                                 }
                             });
@@ -373,6 +373,8 @@ public class AppController {
         return user;
     }
     public void setUser(User user) {
+        Log.d(TAG, "ChatRoom: setUser: " + user);
+    
         this.user = user;
     }
     //endregion Getter/Setter

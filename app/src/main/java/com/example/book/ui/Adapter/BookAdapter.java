@@ -84,7 +84,10 @@ public class BookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
                 if (listener != null) {
                     int position = holder.getAdapterPosition();
                     if (position != RecyclerView.NO_POSITION) {
+                        listener.onItemClick(position);
+                        // Open the BookDetailActivity and pass the details
                         Intent intent = new Intent(view.getContext(), BookDetailActivity.class);
+                        intent.putExtra("postId", book.getPostId());
                         intent.putExtra("bookName", book.getBookName());
                         intent.putExtra("bookPrice", book.getBookPrice());
                         intent.putExtra("imageUrl", book.getImageUrl());

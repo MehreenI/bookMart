@@ -6,16 +6,19 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.book.ChatActivity;
+import com.example.book.AppController;
 import com.example.book.R;
+import com.example.book.manager.FirebaseManager;
 import com.example.book.ui.Adapter.NotificationAdapter;
 import com.example.book.ui.Model.Bid;
+import com.example.book.ui.activity.ChatActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -160,20 +163,19 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void startChat(Bid notification) {
-        // Example: Start a chat with the bidder
-
-        // Get necessary information for starting the chat
-        String postId = notification.getbookName();
         String bidderId = notification.getBidderId();
 
         // Replace this with your logic to start a chat using postId and bidderId
         // For example, you might navigate to a chat activity or fragment
         // or use Firebase Realtime Database to create a chat room
+        Toast.makeText(getActivity(), "Conversation Start", Toast.LENGTH_SHORT).show();
+        String postId;
+        if (notification.getPostId() == null){
+            postId = "dummyPost";
+        }else{
+            postId = notification.getPostId();
+        }
+        AppController.getInstance().getManager(FirebaseManager.class).isChatRoomCreated(postId, notification.getBidderId());
 
-        // Example: Navigating to a ChatActivity
-        Intent intent = new Intent(requireContext(), ChatActivity.class);
-        intent.putExtra("postId", postId);
-        intent.putExtra("bidderId", bidderId);
-        startActivity(intent);
     }
 }

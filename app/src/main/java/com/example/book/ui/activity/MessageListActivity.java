@@ -1,4 +1,4 @@
-package com.example.book.activity;
+package com.example.book.ui.activity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -18,52 +18,52 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageListActivity extends AppCompatActivity {
-
-    //region Attributes
-    //region Class Constant
-    private ActivityMessageListBinding actBinding;
-    private Activity activity;
-    private final String TAG = "MessageListActivity";
-    //endregion Class Constant
-    private MessageListAdapter messageListAdapter;
-    private String username;
-    //endregion Attributes
-
-    //region Methods
-    //region Initialization
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        actBinding = ActivityMessageListBinding.inflate(getLayoutInflater());
-        setContentView(actBinding.getRoot());
-        activity = this;
-        AppController.getInstance().setCurrentActivity(activity);
-
-        username = AppController.getInstance().getUser().getUsername();
-
-        List<ChatRoom> chatRooms = new ArrayList<>();
-        chatRooms.addAll(AppController.getInstance().getChatRooms());
-        Log.d(TAG, "username: " + username);
-        Log.d(TAG, "chatRooms: " + chatRooms);
-        messageListAdapter = new MessageListAdapter(this, username, chatRooms);
-        actBinding.recChat.setLayoutManager(new LinearLayoutManager(this));
-        actBinding.recChat.setAdapter(messageListAdapter);
-        updateVisibility();
-    }
-    //endregion Initialization
-
-    private void updateVisibility() {
-        if (messageListAdapter.getItemCount() > 0) {
-            actBinding.recChat.setVisibility(View.VISIBLE);
-            actBinding.recEmpty.setVisibility(View.GONE);
-        } else {
-            actBinding.recChat.setVisibility(View.GONE);
-            actBinding.recEmpty.setVisibility(View.VISIBLE);
-        }
-    }
-    //endregion Methods
-
-    //region Extras
-    //endregion Extras
-
+	
+	//region Attributes
+	//region Class Constant
+	private ActivityMessageListBinding actBinding;
+	private Activity activity;
+	private final String TAG = "MessageListActivity";
+	//endregion Class Constant
+	private MessageListAdapter messageListAdapter;
+	private String username;
+	//endregion Attributes
+	
+	//region Methods
+	//region Initialization
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		actBinding = ActivityMessageListBinding.inflate(getLayoutInflater());
+		setContentView(actBinding.getRoot());
+		activity = this;
+		AppController.getInstance().setCurrentActivity(activity);
+		
+		username = AppController.getInstance().getUser().getUsername();
+		
+		List<ChatRoom> chatRooms = new ArrayList<>();
+		chatRooms.addAll(AppController.getInstance().getChatRooms());
+		Log.d(TAG, "username: " + username);
+		Log.d(TAG, "chatRooms: " + chatRooms);
+		messageListAdapter = new MessageListAdapter(this, username, chatRooms);
+		actBinding.recChat.setLayoutManager(new LinearLayoutManager(this));
+		actBinding.recChat.setAdapter(messageListAdapter);
+		updateVisibility();
+	}
+	//endregion Initialization
+	
+	private void updateVisibility() {
+		if (messageListAdapter.getItemCount() > 0) {
+			actBinding.recChat.setVisibility(View.VISIBLE);
+			actBinding.recEmpty.setVisibility(View.GONE);
+		} else {
+			actBinding.recChat.setVisibility(View.GONE);
+			actBinding.recEmpty.setVisibility(View.VISIBLE);
+		}
+	}
+	//endregion Methods
+	
+	//region Extras
+	//endregion Extras
+	
 }
